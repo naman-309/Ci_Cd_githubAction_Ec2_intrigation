@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./backend
+    container_name: devopslab-backend
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./devops-dashboard
+    container_name: devopslab-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = '';
 
 function App() {
   const [backendStatus, setBackendStatus] = useState('Checking...');
