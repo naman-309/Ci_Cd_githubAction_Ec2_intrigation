@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import './App.css';
-
+import Hero from './Hero';
 const API_URL = '';
 
 function App() {
@@ -155,7 +155,9 @@ function App() {
           Built to understand DevOps, one step at a time.
         </p>
         <span>React · Node.js · Docker · AWS</span>
+        <Hero></Hero>
       </footer>
+
     </div>
   );
 }
