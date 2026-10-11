@@ -1,0 +1,119 @@
+DevOpsLab — Docker to AWS EC2 CI/CD
+1. Project architecture
+React + Vite Frontend
+Nginx serves the production build on port 80
+
+Nginx Reverse Proxy
+Routes /api/* requests to the backend
+
+Node.js + Express Backend
+Port 5000 inside the Docker network
+
+
+Both frontend and backend run as Docker containers managed by Docker Compose. The EC2 server hosts the containers, and GitHub Actions automates deployment.
+2. Complete setup flow
+1. Build the project locally
+   Created the frontend with React + Vite and the backend with Node.js + Express. The backend provides /api/health and /api/info.
+   Project structure:
+   devops-dashboard/
+   backend/
+   compose.yaml
+2. Create Dockerfiles
+   - devops-dashboard/Dockerfile: builds React and serves the production files using Nginx.
+   - backend/Dockerfile: installs production dependencies and runs the Express server.
+   - .dockerignore: prevents unnecessary files like node_modules, .git, and .env from being copied into images.
+   Docker packages each application and its required runtime into an image.
+3. Configure Nginx and Docker Compose
+   - devops-dashboard/nginx.conf serves the frontend and proxies /api/ requests to http://backend:5000.
+   - Root compose.yaml defines the two services and their networking.
+   - On EC2, the frontend maps host port 80 to container port 80. The backend's port is not published publicly.
+   Local testing used docker compose up --build -d, and the frontend and API endpoints were verified.
+4. Push the project to GitHub
+   Created the public repository and pushed the project to the main branch. GitHub holds the source code and the deployment workflow.
+5. Create and prepare the AWS EC2 instance
+   - Launched an Ubuntu EC2 instance.
+   - Connected using SSH.
+   - Installed Docker Engine and the Docker Compose plugin.
+   - Cloned the GitHub repository into ~/Ci_Cd_githubAction_Ec2_intrigation.
+   - Updated compose.yaml for production deployment.
+   The AWS Security Group allows SSH on port 22 and public HTTP access on port 80. The subnet also needs a working route through an Internet Gateway for public IPv4 access.
+6. Create a dedicated SSH deployment key
+   In Windows PowerShell, generated a separate Ed25519 key pair:
+   ssh-keygen -t ed25519 -C "github-actions-deploy" -f "$HOME\.ssh\devopslab-deploy"
+   
+   
+   This created two files:
+   - devopslab-deploy — private key; keep secret.
+   - devopslab-deploy.pub — public key; safe to add to the EC2 server.
+   Added the public key as a new line in ~/.ssh/authorized_keys on EC2, preserving the existing key. Set permissions using chmod 700 ~/.ssh and chmod 600 ~/.ssh/authorized_keys.
+   Tested the new key from Windows with:
+   ssh -i "$HOME\.ssh\devopslab-deploy" ubuntu@YOUR_PUBLIC_IP
+   
+   
+   Successful login confirmed that the new key works.
+7. Configure GitHub repository secrets
+   Opened GitHub repository → Settings → Secrets and variables → Actions and created:
+   Secret name	Value
+   EC2_HOST	EC2 public IPv4 address
+   EC2_USER	ubuntu
+   EC2_SSH_KEY	Entire private key contents
+   Secrets keep credentials out of the repository's source code. Even though the repository is public, these secrets are not published with it.
+8. Create the GitHub Actions workflow
+   Created .github/workflows/deploy.yml in the project root. This workflow runs on pushes to main and can also be started manually.
+   .github/
+     workflows/
+       deploy.yml
+   
+   
+   Its steps are:
+   1. Start an Ubuntu runner hosted by GitHub.
+   2. Connect to EC2 using the SSH action and repository secrets.
+   3. Change to the project directory.
+   4. Pull the latest code from main.
+   5. Run sudo docker compose up --build -d.
+   6. Clean up unused Docker images.
+   Committed and pushed the workflow file to GitHub so the Actions service can discover and run it.
+9. Verify deployment
+   Opened the repository's Actions tab and selected the latest Deploy DevOpsLab to EC2 run.
+   - Green check = workflow completed successfully.
+   - Red cross = inspect the failed step's logs.
+   - Yellow indicator = workflow is still running.
+   The website and /api/health and /api/info endpoints were also tested through the EC2 public IP.
+3. Final CI/CD flow
+
+Developer changes code
+        |
+        v
+git add / git commit / git push
+        |
+        v
+GitHub repository (main branch)
+        |
+        v
+GitHub Actions detects push
+        |
+        v
+SSH connection to AWS EC2
+(using GitHub Secrets)
+        |
+        v
+git pull origin main
+        |
+        v
+docker compose up --build -d
+        |
+        v
+New Docker images and containers
+        |
+        v
+Live website updated
+
+
+
+4. Important commands for future use
+Purpose	Command
+Check containers	sudo docker compose ps
+View logs	sudo docker compose logs --tail=50
+Deploy manually	sudo docker compose up --build -d
+Check Git changes	git status
+Pull latest code	git pull origin main
