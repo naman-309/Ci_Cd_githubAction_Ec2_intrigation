@@ -4,7 +4,7 @@ const Hero = () => {
     return (
         <div>Hero
 
-            <h1>this is for  testng that CI CD  wokring Acutlly</h1>
+            <h1> this is new  chnage  </h1>
         </div>
     )
 }
