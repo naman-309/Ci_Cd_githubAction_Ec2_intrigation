@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import Hero from './Hero';
+import About from './About';
 const API_URL = '';
 
 function App() {
@@ -156,6 +157,7 @@ function App() {
         </p>
         <span>React · Node.js · Docker · AWS</span>
         <Hero></Hero>
+        <About></About>
       </footer>
 
     </div>

@@ -4,7 +4,7 @@ const Hero = () => {
     return (
         <div>Hero
 
-            <h1> this is new  chnage  </h1>
+            <p>this is the  recent  chnahe  in hero page </p>
         </div>
     )
 }
