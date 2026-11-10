@@ -60,7 +60,7 @@ function App() {
         <div className="hero-content">
           <div className="tag">
             <span className="dot"></span>
-            MY DEVOPS LEARNING PROJECT
+            MY DEVOPS LEARNING PROJECT ci cd pipeline
           </div>
 
           <h1>
