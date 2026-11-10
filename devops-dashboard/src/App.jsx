@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import Hero from './Hero';
 import About from './About';
+import ContactUs from './Contact';
 const API_URL = '';
 
 function App() {
@@ -50,7 +51,7 @@ function App() {
     <div className="page">
       <nav className="navbar">
         <h2>
-          DevOps<span>Lab.</span>
+          NKKR  <span>Lab.</span>
         </h2>
         <p>Learning by Building</p>
       </nav>
@@ -158,7 +159,11 @@ function App() {
         <span>React · Node.js · Docker · AWS</span>
         <Hero></Hero>
         <About></About>
+
+        <ContactUs></ContactUs>
+
       </footer>
+
 
     </div>
   );
